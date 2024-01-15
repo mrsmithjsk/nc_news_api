@@ -20,7 +20,7 @@ describe("/api/topics", () => {
         expect(response.body).toHaveProperty('topics');
         expect(response.body.topics).toBeInstanceOf(Array);
         const topics = response.body.topics;
-        expect(topics.length).toBeGreaterThan(0);
+        expect(topics.length).toBe(3);
         topics.forEach(topic => {
             expect(topic).toHaveProperty('slug');
             expect(topic).toHaveProperty('description');
@@ -35,10 +35,18 @@ describe("GET /api", () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual(expectedEndpoints);
     });
-    it("should have properties for each endpoint", async() => {
-        const response = await request(app).get('/api');
-        expect(response.body).toHaveProperty("GET /api/topics");
-        expect(response.body).toHaveProperty("GET /api/articles");
-    });
+})
+
+describe("GET /api/articles/:article_id", () => {
+    it("should return an article by ID", async () => {
+        const response = await request(app).get('/api/articles/1');
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('article')
+    })
+    it("should return 404 if invalid article ID", async () => {
+        const response = await request(app).get('/api/articles/9999');
+        expect(response.status).toBe(404);
+        expect(response.body.msg).toBe('Article not found')
+    })
 })
 
