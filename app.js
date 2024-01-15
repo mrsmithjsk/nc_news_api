@@ -1,18 +1,10 @@
 const express = require('express');
-const { getAllTopics } = require('./Controllers/topics.controller');
+const { getAllTopics, getAllEndPoints } = require('./Controllers/topics.controller.js');
 const app = express();
 
 app.use(express.json());
 
-app.get('/api/topics', getAllTopics)
-
-const PORT = process.env.PORT || 9090;
-app.listen(PORT, (error) => {
-    if(error) {
-        console.log(error)
-    } else {
-    console.log(`Server is running on port ${PORT}`);
-};
-})
+app.get('/api/topics', getAllTopics);
+app.get('/api', getAllEndPoints);
 
 module.exports = app;
