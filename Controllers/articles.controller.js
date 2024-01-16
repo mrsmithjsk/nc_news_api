@@ -18,7 +18,6 @@ exports.getArticleById = async (request, response, next) => {
 
 exports.getAllArticles = async (request, response, next) => {
     const { sort_by } = request.query;
-
     try {
         const articles = await selectAllArticles(sort_by);
         response.status(200).json({ articles });
@@ -31,3 +30,4 @@ exports.getAllArticles = async (request, response, next) => {
         }
     }
 };
+

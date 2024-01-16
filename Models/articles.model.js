@@ -32,3 +32,5 @@ exports.selectAllArticles = async (sorted_by) => {
     }
     return result.rows;
 };
+
+

@@ -94,7 +94,43 @@ describe("GET /api/articles", () => {
         const response = await request(app).get('/api/articles?sort_by=nonexistenttopic');
         expect(response.status).toBe(404);
         expect(response.body).toMatchObject({ msg: 'Article not found' });
-      });
+    });
 
 })
 
+describe("/api/articles/:article_id/comments", () => {
+    it("The endpoint will respond with an array", async () => {
+        const response = await request(app).get("/api/articles/9/comments");
+        expect(response.status).toBe(200);
+        const { body } = response;
+        expect(Array.isArray(body.comments)).toBe(true);
+    });
+    it("should return an array of comments from the given article ID", async () => {
+        const response = await request(app).get("/api/articles/1/comments");
+        expect(response.status).toBe(200);
+        const { body } = response;
+        expect(body.comments.length).toBe(11);
+        body.comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number");
+            expect(typeof comment.votes).toBe("number");
+            expect(typeof comment.created_at).toBe("string");
+            expect(typeof comment.author).toBe("string");
+            expect(typeof comment.body).toBe("string");
+            expect(comment.article_id).toBe(1);
+        });
+    });
+    it('should return 200 status code and an empty array given valid ID by not comment', async () => {
+        const response = await request(app).get("/api/articles/2/comments");
+        expect(response.status).toBe(200);
+        const { body } = response;
+        expect(body.comments).toEqual([]);
+    });
+    it("should return 404 given a valid article ID but no comment", async () => {
+        const response = await request(app).get("/api/articles/555667/comments")
+        expect(response.status).toBe(404);
+        const { body } = response;
+        expect(body.msg).toBe("Comment not found");
+      });
+
+
+})
