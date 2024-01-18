@@ -1,4 +1,4 @@
-const { selectArticleById, selectAllArticles } = require('../Models/articles.model.js');
+const { selectArticleById, selectAllArticles, patchArticles } = require('../Models/articles.model.js');
 
 exports.getArticleById = async (request, response, next) => {
     const { article_id } = request.params;
@@ -17,9 +17,9 @@ exports.getArticleById = async (request, response, next) => {
 };
 
 exports.getAllArticles = async (request, response, next) => {
-    const { sort_by } = request.query;
+    const { sort_by, topic } = request.query;
     try {
-        const articles = await selectAllArticles(sort_by);
+        const articles = await selectAllArticles(sort_by, topic);
         response.status(200).json({ articles });
     } catch (error) {
         if (error.status === 404) {
@@ -31,3 +31,25 @@ exports.getAllArticles = async (request, response, next) => {
     }
 };
 
+exports.patchArticleById = async (request,response, next) => {
+    const { article_id } = request.params;
+    const { inc_votes } = request.body;
+    try {
+        if(inc_votes === undefined || typeof inc_votes !== 'number') {
+            const error = new Error('Invalid inc_votes value');
+            error.status = 400;
+            throw error;
+        }
+        const updatedArticle = await patchArticles(article_id, inc_votes);
+        if(!updatedArticle) {
+            const error = new Error('Article not found');
+            error.status = 404;
+            throw error;
+        }
+        response.status(200).json({ article: updatedArticle });
+    } catch (error) {
+        console.error('Error updating all votes:', error);
+        response.status(error.status || 500).json({ error: error.message });
+        next(error);
+    }
+}

@@ -130,7 +130,164 @@ describe("/api/articles/:article_id/comments", () => {
         expect(response.status).toBe(404);
         const { body } = response;
         expect(body.msg).toBe("Comment not found");
-      });
+    });
+    it('should return 400 for an invalid article ID when getting comments', async () => {
+        const response = await request(app).get('/api/articles/not-an-id/comments');
+        expect(response.status).toBe(400);
+        expect(response.body).toMatchObject({ error: 'Invalid article ID' });
+    });
+})
 
+describe('Post /api/articles/:article_id/comments', () => {
+    it('should add a comment to an article', async () => {
+        const response = await request(app)
+            .post('/api/articles/1/comments')
+            .send({
+                username: 'butter_bridge',
+                body: 'This is a test comment',
+            });
+        expect(response.status).toBe(201);
+        const { comment } = response.body;
+        expect(comment).toHaveProperty('comment_id');
+        expect(comment).toHaveProperty('author', 'butter_bridge');
+        expect(comment).toHaveProperty('body', 'This is a test comment');
+        expect(comment).toHaveProperty('article_id', 1);
+    });
+    it('should return for a valid but non-existent article', async () => {
+        const response = await request(app)
+            .post('/api/articles/999/comments')
+            .send({
+                username: 'butter_bridge',
+                body: 'This is a test comment',
+            });
+        expect(response.status).toBe(404);
+    });
+    it('should handle missing username or body', async () => {
+        const response = await request(app)
+          .post('/api/articles/1/comments')
+          .send({
+            
+          });
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty('error', 'Username and body are required');
+    });
+    // it.only('should throw an error for unnecessary properties', async () => {
+    //     const response = await request(app)
+    //       .post('/api/articles/1/comments')
+    //       .send({
+    //             username: 'butter_bridge',
+    //             body: 'This is a test comment',
+    //             unnecessaryProperty: 'extra',
+    //         });
+    //     console.log('Response Body:', response.body);
+    //     console.log('Response Status:', response.status);
+    //     expect(response.status).toBe(201);
+    //     expect(response.body.error).toBe('Unnecessary property detected');
+    // });
+    // it.only('should throw an error for an invalid article_id', async () => {
+    //     const response = await request(app)
+    //     .post('/api/articles/9999999/comments')
+    //     .send({
+    //         username: 'butter_bridge',
+    //         body: 'This is a test comment',
+    //     });
+    //     console.log('Response Body:', response.body);
+    //     console.log('Response Status:', response.status);
+    //     expect(response.status).toBe(404);
+    //     expect(response.bodyerror).toBe('Article not found');
+    // });
+    it('should throw an error if the username does not exist', async () => {
+        const response = await request(app)
+        .post('/api/articles/1/comments')
+        .send({
+            username: 'testuser',
+            body: 'This is a test comment',
+            unnecessaryProperty: 'extra',
+        });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('Username does not exist');
+    })
+    
+})
+
+describe('Patch /api/articles/:article_id', () => {
+    it('should increment article votes with a valid inc_votes value', async () => {
+        const response = await request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 1 });
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('article');
+        expect(response.body.article).toHaveProperty('votes', 101);
+    });
+    it('should decrement article votes with a valid inc_votes value', async () => {
+        const response = await request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: -1 });
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('article');
+        expect(response.body.article).toHaveProperty('votes', 99);
+    });
+    it('should return 400 for an invalid inc_votes value', async () => {
+        const response = await request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 'invalid' });
+        expect(response.status).toBe(400);
+        expect(response.body).toMatchObject({ error: 'Invalid inc_votes value' });
+    });
+    it('should return 404 for a non-existing article', async () => {
+        const response = await request(app)
+        .patch('/api/articles/999')
+        .send({ inc_votes: 5 });
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty('error', 'Article not found');
+    });
+})
+
+describe('Delete /api/comments/:comment_id', () => {
+    it('should return an empty object upon sucessful deletion', async () => {
+        const response = await request(app).delete('/api/comments/1');
+        expect(response.status).toBe(204);
+        expect(response.body).toEqual({});
+    })
+    it('should return 404 for a non-existing comment', async () => {
+        const response = await request(app).delete('/api/comments/999');
+        expect(response.status).toBe(404);
+        expect(response.body).toMatchObject({ error: 'Comment does not exist' })
+    })
+    it('should return 400 for an invalid comment', async () => {
+        const response = await request(app).delete('/api/comments/invalid');
+        expect(response.status).toBe(400);
+        expect(response.body).toMatchObject({ error: 'Invalid comment_id' });
+    })
+})
+
+describe('Get /api/users', () => {
+    it('should return users with the correct properties', async () => {
+        const response = await request(app).get('/api/users');
+        expect(response.status).toBe(200);
+        expect(response.body.length).toBe(4)
+        response.body.forEach((user) => {
+            expect(user).toHaveProperty('username');
+            expect(user).toHaveProperty('name');
+            expect(user).toHaveProperty('avatar_url');
+        })
+    });
+})
+
+describe('Further GET /api/users', () => {
+    it("should return articles filtered by topic", async () => {
+        const response = await request(app).get("/api/articles?topic=mitch");
+        expect(response.status).toBe(200);
+        expect(response.body.articles.length).toBeGreaterThan(0);
+        const articles = response.body.articles;
+        articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+        });
+    });
+    it("should return 404 for a non-existent topic", async () => {
+        const response = await request(app).get("/api/articles?topic=nonexistenttopic");
+        expect(response.status).toBe(404);
+        expect(response.body).toMatchObject({ msg: 'Article not found' });
+    });
 
 })
