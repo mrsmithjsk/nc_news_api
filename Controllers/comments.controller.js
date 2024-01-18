@@ -25,6 +25,7 @@ exports.getAllCommentsFromID = async (request, response, next) => {
 exports.postCommentById = async (request, response, next) => {
     const { article_id } = request.params;
     const { username, body } = request.body;
+    //console.log('Request Body:', request.body);
     try {
         const articleExists = await checkArticleExists(article_id);
         if (!articleExists) {
@@ -35,11 +36,17 @@ exports.postCommentById = async (request, response, next) => {
         response.status(201).json({ comment });
     } catch (error) {
         console.error('Error posting comment:', error);
+
         if (error.message === 'Username and body are required') {
-            response.status(400).json({ error: 'Username and body are required' });;
+            response.status(400).json({ error: 'Username and body are required' });
+        } else if (error.message === 'Username does not exist') {
+            response.status(400).json({ error: 'Username does not exist' });
+        } else if (error.message === 'Invalid article_id') {
+            response.status(404).json({ error: 'Invalid article_id' });
         } else {
             response.status(500).json({ error: 'Internal Server Error' });
         }
+
         next(error);
     }
 };

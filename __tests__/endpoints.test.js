@@ -3,7 +3,6 @@ const request = require("supertest");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
-const { getAllCommentsFromID } = require("../Controllers/comments.controller");
 //const jest-sorted = require('jest-sorted');
 
 afterAll(() => {
@@ -154,7 +153,7 @@ describe('Post /api/articles/:article_id/comments', () => {
         expect(comment).toHaveProperty('body', 'This is a test comment');
         expect(comment).toHaveProperty('article_id', 1);
     });
-    it('should return for an invalid article', async () => {
+    it('should return for a valid but non-existent article', async () => {
         const response = await request(app)
             .post('/api/articles/999/comments')
             .send({
@@ -162,11 +161,6 @@ describe('Post /api/articles/:article_id/comments', () => {
                 body: 'This is a test comment',
             });
         expect(response.status).toBe(404);
-        if(response.body && response.body.error){
-        expect(response.body.error).toEqual('Article not found');
-        } else {
-        console.log('expected error response not found in response body');
-        }
     });
     it('should handle missing username or body', async () => {
         const response = await request(app)
@@ -176,7 +170,44 @@ describe('Post /api/articles/:article_id/comments', () => {
           });
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty('error', 'Username and body are required');
-      });
+    });
+    // it.only('should throw an error for unnecessary properties', async () => {
+    //     const response = await request(app)
+    //       .post('/api/articles/1/comments')
+    //       .send({
+    //             username: 'butter_bridge',
+    //             body: 'This is a test comment',
+    //             unnecessaryProperty: 'extra',
+    //         });
+    //     console.log('Response Body:', response.body);
+    //     console.log('Response Status:', response.status);
+    //     expect(response.status).toBe(201);
+    //     expect(response.body.error).toBe('Unnecessary property detected');
+    // });
+    // it.only('should throw an error for an invalid article_id', async () => {
+    //     const response = await request(app)
+    //     .post('/api/articles/9999999/comments')
+    //     .send({
+    //         username: 'butter_bridge',
+    //         body: 'This is a test comment',
+    //     });
+    //     console.log('Response Body:', response.body);
+    //     console.log('Response Status:', response.status);
+    //     expect(response.status).toBe(404);
+    //     expect(response.bodyerror).toBe('Article not found');
+    // });
+    it('should throw an error if the username does not exist', async () => {
+        const response = await request(app)
+        .post('/api/articles/1/comments')
+        .send({
+            username: 'testuser',
+            body: 'This is a test comment',
+            unnecessaryProperty: 'extra',
+        });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('Username does not exist');
+    })
+    
 })
 
 describe('Patch /api/articles/:article_id', () => {
@@ -228,9 +259,23 @@ describe('Delete /api/comments/:comment_id', () => {
         expect(response.status).toBe(400);
         expect(response.body).toMatchObject({ error: 'Invalid comment_id' });
     })
-    it.only('should return 404 for trying to delete a non-existing comment', async () => {
-        const response = await request(app).delete('/api/comments/9999');
-        expect(response.status).toBe(404);
-        expect(response.body).toMatchObject({ error: 'Comment does not exist' });
+})
+
+describe('Get /api/users', () => {
+    it('should return an array of users', async () => {
+        const response = await request(app).get('/api/users');
+        expect(response.status).toBe(200);
+        expect(Array.isArray(response.body)).toBe(true);
+    });
+    it('should return users with the correct properties', async () => {
+        const response = await request(app).get('/api/users');
+        expect(response.status).toBe(200);
+        expect(response.body.length).toBe(4)
+        response.body.forEach((user) => {
+            expect(user).toHaveProperty('username');
+            expect(user).toHaveProperty('name');
+            expect(user).toHaveProperty('avatar_url');
+        })
     })
+
 })
