@@ -278,7 +278,7 @@ describe('Further GET /api/users', () => {
     it("should return articles filtered by topic", async () => {
         const response = await request(app).get("/api/articles?topic=mitch");
         expect(response.status).toBe(200);
-        expect(response.body.articles.length).toBeGreaterThan(0);
+        expect(response.body.articles.length).toBe(12);
         const articles = response.body.articles;
         articles.forEach((article) => {
             expect(article.topic).toBe("mitch");
