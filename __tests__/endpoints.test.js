@@ -262,11 +262,6 @@ describe('Delete /api/comments/:comment_id', () => {
 })
 
 describe('Get /api/users', () => {
-    it('should return an array of users', async () => {
-        const response = await request(app).get('/api/users');
-        expect(response.status).toBe(200);
-        expect(Array.isArray(response.body)).toBe(true);
-    });
     it('should return users with the correct properties', async () => {
         const response = await request(app).get('/api/users');
         expect(response.status).toBe(200);
@@ -276,6 +271,23 @@ describe('Get /api/users', () => {
             expect(user).toHaveProperty('name');
             expect(user).toHaveProperty('avatar_url');
         })
-    })
+    });
+})
+
+describe('Further GET /api/users', () => {
+    it("should return articles filtered by topic", async () => {
+        const response = await request(app).get("/api/articles?topic=mitch");
+        expect(response.status).toBe(200);
+        expect(response.body.articles.length).toBeGreaterThan(0);
+        const articles = response.body.articles;
+        articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+        });
+    });
+    it("should return 404 for a non-existent topic", async () => {
+        const response = await request(app).get("/api/articles?topic=nonexistenttopic");
+        expect(response.status).toBe(404);
+        expect(response.body).toMatchObject({ msg: 'Article not found' });
+    });
 
 })

@@ -46,7 +46,6 @@ exports.postCommentById = async (request, response, next) => {
         } else {
             response.status(500).json({ error: 'Internal Server Error' });
         }
-
         next(error);
     }
 };

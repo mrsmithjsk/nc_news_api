@@ -17,9 +17,9 @@ exports.getArticleById = async (request, response, next) => {
 };
 
 exports.getAllArticles = async (request, response, next) => {
-    const { sort_by } = request.query;
+    const { sort_by, topic } = request.query;
     try {
-        const articles = await selectAllArticles(sort_by);
+        const articles = await selectAllArticles(sort_by, topic);
         response.status(200).json({ articles });
     } catch (error) {
         if (error.status === 404) {
