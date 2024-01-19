@@ -85,7 +85,6 @@ exports.selectAllArticles = async (sorted_by, topic) => {
 exports.checkArticleExists = async (article_id) => {
     const articleIdAsInt = parseInt(article_id);
     if (isNaN(articleIdAsInt) || articleIdAsInt <= 0) {
-        //('Invalid article_id:', article_id);
         throw new Error('Invalid article_id');
     }
     const result = await db.query('SELECT COUNT(*) FROM articles WHERE article_id = $1', [articleIdAsInt]);

@@ -5,7 +5,6 @@ exports.getAllUsers = async (request,response,next) => {
         const users = await getUsers();
         response.status(200).json(users);
     } catch (error) {
-        //('Error getting users:', error);
         next(error);
     }
 }

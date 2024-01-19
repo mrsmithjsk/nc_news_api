@@ -24,7 +24,6 @@ exports.getAllArticles = async (request, response, next) => {
         if (error.status === 404) {
             response.status(404).json({ msg: "Article not found" });
         } else {
-            //('Error getting all articles:', error);
             next(error);
         }
     }
@@ -47,7 +46,6 @@ exports.patchArticleById = async (request,response, next) => {
         }
         response.status(200).json({ article: updatedArticle });
     } catch (error) {
-        //('Error updating all votes:', error);
         response.status(error.status || 500).json({ error: error.message });
         next(error);
     }
