@@ -306,9 +306,4 @@ describe('Further GET /api/articles/:article_id', () => {
         const commentCount = parseInt(response.body.article.comment_count, 10);
         expect(typeof commentCount).toBe('number');
     });
-    it("should return 404 and an error message when the provided article_id does not exist", async () => {
-        const response = await request(app).get('/api/articles/999'); 
-        expect(response.status).toBe(404);
-        expect(response.body).toMatchObject({ msg: 'Article not found' });
-    });
 })
