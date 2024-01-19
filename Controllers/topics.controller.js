@@ -7,7 +7,7 @@ exports.getAllTopics = async (request, response, next) => {
         const topics = await selectTopics();
         response.status(200).json({ topics });
     } catch (error) {
-        console.error("Error getting topics:", error);
+        //("Error getting topics:", error);
         next(error);
     }
 };
@@ -18,7 +18,7 @@ exports.getAllEndPoints = async (request, response, next) => {
         const parsedEndPoints = JSON.parse(endPointsData);
         response.status(200).json(parsedEndPoints );
     } catch (error) {
-        console.error("Error getting endpoints:", error);
+        //("Error getting endpoints:", error);
         next(error);
     }
 }

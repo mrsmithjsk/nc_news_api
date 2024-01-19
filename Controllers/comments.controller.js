@@ -14,7 +14,7 @@ exports.getAllCommentsFromID = async (request, response, next) => {
         }
         response.status(200).json({ comments });
     } catch (error) {
-        console.error('Error getting comments:', error);
+        //('Error getting comments:', error);
         if (error.message === 'Article not found') {
             return response.status(404).json({ msg: 'Comment not found' });
         }
@@ -35,7 +35,7 @@ exports.postCommentById = async (request, response, next) => {
         const comment = await addComment(article_id, username, body);
         response.status(201).json({ comment });
     } catch (error) {
-        console.error('Error posting comment:', error);
+        //('Error posting comment:', error);
 
         if (error.message === 'Username and body are required') {
             response.status(400).json({ error: 'Username and body are required' });
@@ -61,7 +61,7 @@ exports.deleteCommentById = async (request, response, next) => {
         await deleteComments(comment_id)
         response.status(204).send();
     } catch (error) {
-        console.error('Error deleting comment:', error);
+        //('Error deleting comment:', error);
         if (error.status === 400) {
             response.status(400).json({ error: 'Invalid comment_id' });
         } else if (error.status === 404) {

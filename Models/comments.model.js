@@ -21,7 +21,7 @@ exports.addComment = async (article_id, username, body) => {
     const allowedProperties = ['article_id', 'username', 'body'];
     const unnecessaryProperties = Object.keys({article_id, username, body}).filter(property => !allowedProperties.includes(property));
     if(unnecessaryProperties.length>0) {
-        console.error('Unnecessary property detected');
+        //('Unnecessary property detected');
         throw new Error('Unnecessary property detected');
         
     }
