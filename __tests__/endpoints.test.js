@@ -289,5 +289,26 @@ describe('Further GET /api/users', () => {
         expect(response.status).toBe(404);
         expect(response.body).toMatchObject({ msg: 'Article not found' });
     });
+    it("should return 404 if no articles found for a valid topic", async () => {
+        const response = await request(app).get('/api/articles?topic=paper');
+        console.log(response.body);
+        expect(response.status).toBe(404); 
+        expect(response.body).toEqual({ msg: 'Article not found' });
+    });
 
+})
+
+describe('Further GET /api/articles/:article_id', () => {
+    it('should return an article with comment_count when a valid article_id is provided', async () => {
+        const response = await request(app).get('/api/articles/1');
+        expect(response.status).toBe(200);
+        expect(response.body.article).toHaveProperty('comment_count');
+        const commentCount = parseInt(response.body.article.comment_count, 10);
+        expect(typeof commentCount).toBe('number');
+    });
+    it("should return 404 and an error message when the provided article_id does not exist", async () => {
+        const response = await request(app).get('/api/articles/999'); 
+        expect(response.status).toBe(404);
+        expect(response.body).toMatchObject({ msg: 'Article not found' });
+    });
 })

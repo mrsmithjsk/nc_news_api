@@ -1,7 +1,28 @@
 const db = require('../db/connection.js');
 
 exports.selectArticleById = async (article_id) => {
-    const result = await db.query('SELECT * FROM articles WHERE article_id = $1', [article_id]);
+    const result = await db.query(`
+        SELECT 
+            articles.author, 
+            articles.title, 
+            articles.article_id, 
+            articles.topic, 
+            articles.body, 
+            articles.created_at, 
+            articles.votes, 
+            articles.article_img_url, 
+            COUNT(comments.comment_id) AS comment_count 
+        FROM articles 
+        LEFT JOIN comments ON articles.article_id = comments.article_id 
+        WHERE articles.article_id = $1
+        GROUP BY articles.author,  
+            articles.title,  
+            articles.article_id, 
+            articles.topic, 
+            articles.body, 
+            articles.created_at, 
+            articles.votes, 
+            articles.article_img_url;`, [article_id]);
     if(result.rows.length === 0) {
         const error = new Error('Article not found');
         error.status = 404;
