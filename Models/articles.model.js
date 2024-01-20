@@ -31,9 +31,9 @@ exports.selectArticleById = async (article_id) => {
     return result.rows[0];
 };
 
-exports.selectAllArticles = async (sorted_by, topic) => {
+exports.selectAllArticles = async (sort_by, topic) => {
     const allowedSortColumns = ['created_at'];
-    if (sorted_by && !allowedSortColumns.includes(sorted_by)) {
+    if (sort_by && !allowedSortColumns.includes(sort_by)) {
         const error = new Error('Invalid sort_by parameter');
         error.status = 404; 
         throw error;
@@ -66,8 +66,8 @@ exports.selectAllArticles = async (sorted_by, topic) => {
             articles.votes, 
             articles.article_img_url`;
 
-    if (sorted_by) {
-        query += ` ORDER BY ${sorted_by} DESC`;
+    if (sort_by) {
+        query += ` ORDER BY ${sort_by} DESC`;
     } else {
         query += ` ORDER BY created_at DESC`;
     }
