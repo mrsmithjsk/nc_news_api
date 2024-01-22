@@ -50,7 +50,7 @@ exports.postCommentById = async (request, response, next) => {
 exports.deleteCommentById = async (request, response, next) => {
     const { comment_id } = request.params;
     try {
-        if (!comment_id || isNaN(comment_id)) {
+        if (!comment_id || isNaN(parseInt(comment_id))) {
             const error = new Error('Invalid comment_id');
             error.status = 400;
             throw error;

@@ -291,7 +291,6 @@ describe('Further GET /api/users', () => {
     });
     it("should return 404 if no articles found for a valid topic", async () => {
         const response = await request(app).get('/api/articles?topic=paper');
-        console.log(response.body);
         expect(response.status).toBe(404); 
         expect(response.body).toEqual({ msg: 'Article not found' });
     });
